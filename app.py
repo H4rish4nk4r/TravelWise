@@ -1,24 +1,39 @@
-from flask import Flask, render_template, jsonify, request
-import config
-import openai
-import aiapi
+from flask import Flask, render_template, jsonify, request,send_from_directory
+from flask_cors import CORS
 
+app = Flask(__name__,static_folder='client/public')
+CORS(app)
 
-def page_not_found(e):
-  return render_template('404.html'), 404
+@app.route('/get_info', methods=['POST'])
+def get_info():
+    data = request.get_json()
 
+    # Access the submitted data from the React frontend
+    source = data['source']
+    destination = data['destination']
+    startDate = data['startDate']
+    endDate = data['endDate']
+    travel = data['travel']
+    accommodation = data['accommodation']
 
-app = Flask(__name__)
-app.config.from_object(config.config['development'])
+    # Perform necessary operations with the data
+    # Generate suggestions for travel and accommodation
+    travel_suggestions = ['Suggestion 1', 'Suggestion 2', 'Suggestion 3']
+    accommodation_suggestions = ['Suggestion A', 'Suggestion B', 'Suggestion C']
 
-app.register_error_handler(404, page_not_found)
+    # Prepare the response data
+    response_data = {
+        'source': source,
+        'destination': destination,
+        'startDate': startDate,
+        'endDate': endDate,
+        'travel': travel,
+        'accommodation': accommodation,
+        'travelSuggestions': travel_suggestions,
+        'accommodationSuggestions': accommodation_suggestions
+    }
 
-
-@app.route('/', methods = ['POST', 'GET'])
-def index():
-
-    return render_template('index.html', **locals())
-
+    return jsonify(response_data)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port='8888', debug=True)
+    app.run(debug=True, port=5000)
